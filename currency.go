@@ -36,65 +36,25 @@ func (c *Currency) SetValue(u interface{}) error {
 // Add adds u to c's value. An error occurs if the type of u is
 // not string, int, or float64.
 func (c *Currency) Add(u interface{}) error {
-	v, err := c.wrap(u)
-	if err != nil {
-		return err
-	}
-
-	total := c.unwrap(c.value)
-	newValue := c.unwrap(v)
-	total += newValue
-	c.value, _ = c.wrap(total)
-
-	return nil
+	return c.doOperation('+', u)
 }
 
 // Subtract takes away u from c's value. An error occurs if the
 // type of u is not string, int, or float64.
 func (c *Currency) Subtract(u interface{}) error {
-	v, err := c.wrap(u)
-	if err != nil {
-		return err
-	}
-
-	total := c.unwrap(c.value)
-	newValue := c.unwrap(v)
-	total -= newValue
-	c.value, _ = c.wrap(total)
-
-	return nil
+	return c.doOperation('-', u)
 }
 
 // Multiply multiplies c's value by u. An error occurs if the
 // type of u is not string, int, or float64.
 func (c *Currency) Multiply(u interface{}) error {
-	v, err := c.wrap(u)
-	if err != nil {
-		return err
-	}
-
-	total := c.unwrap(c.value)
-	newValue := c.unwrap(v)
-	total *= newValue
-	c.value, _ = c.wrap(total)
-
-	return nil
+	return c.doOperation('*', u)
 }
 
 // Divide divides c's value by u. An error occurs if the
 // type of u is not string, int, or float64.
 func (c *Currency) Divide(u interface{}) error {
-	v, err := c.wrap(u)
-	if err != nil {
-		return err
-	}
-
-	total := c.unwrap(c.value)
-	newValue := c.unwrap(v)
-	total /= newValue
-	c.value, _ = c.wrap(total)
-
-	return nil
+	return c.doOperation('/', u)
 }
 
 // AsFloat returns the current value as float.
@@ -175,6 +135,33 @@ func (c *Currency) wrap(u interface{}) (v int, err error) {
 //          v = 125065 returns 1250.65
 func (c *Currency) unwrap(v int) float64 {
 	return float64(v) / math.Pow10(c.DecimalPlaces)
+}
+
+// doOperantion does the operation defined by op.
+func (c *Currency) doOperation(op byte, u interface{}) error {
+	v, err := c.wrap(u)
+	if err != nil {
+		return err
+	}
+
+	total := c.unwrap(c.value)
+	newValue := c.unwrap(v)
+
+	switch op {
+	case '+':
+		total += newValue
+	case '-':
+		total -= newValue
+	case '*':
+		total *= newValue
+	case '/':
+		total /= newValue
+	default:
+		return fmt.Errorf("Operation not found: %v", u)
+	}
+
+	c.value, _ = c.wrap(total)
+	return nil
 }
 
 func floatToInt(f float64, decimalPlaces int) (int, error) {
