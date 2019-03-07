@@ -13,7 +13,7 @@ A simple library to deal with financial values written in Go. Currency aims to a
 ## Installation 
 
 ```
-go get githum.com/marcoazevedo1976/currency
+go get github.com/marcoazevedo1976/currency
 ```
 
 ## Getting started
